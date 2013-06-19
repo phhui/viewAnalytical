@@ -1,0 +1,21 @@
+package main.submodules.viewAnalytical
+{
+	import flash.utils.Dictionary;
+	/**
+	 *视图解析接口 
+	 * @author phhui
+	 * 
+	 */	
+	public interface IAnalytical
+	{
+		/**
+		 * 
+		 * @param ixml XML数据源 
+		 * @param _parent 显示容器
+		 * @param view 显示对象容器
+		 * @param func 回调方法
+		 * 
+		 */		
+		function analytical(ixml:XML,_parent:Object,view:Dictionary=null,obj:Object=null):void
+	}
+}

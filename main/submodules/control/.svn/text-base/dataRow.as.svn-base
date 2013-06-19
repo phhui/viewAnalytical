@@ -1,0 +1,89 @@
+package main.submodules.control
+{
+	import com.EventHandle.EventInteraction;
+	import com.yahoo.astra.fl.controls.AbstractButtonRow;
+	
+	import fl.controls.TextArea;
+	
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
+	import flash.events.MouseEvent;
+	import flash.events.TextEvent;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
+	
+	import main.view.windows.tools.CommonTextArea;
+	
+	import mx.controls.Text;
+
+	public class dataRow extends Sprite
+	{
+		private var column:Array;
+		private var columnWidth:int=20;
+		private var bg:Sprite=new Sprite();
+		public function dataRow(w:int,h:int)
+		{
+			column=new Array();
+			createBg(w,h);
+			bg.mouseChildren=false;
+			bg.mouseEnabled=false;
+			this.addEventListener(MouseEvent.ROLL_OVER,overHandler);
+			this.addEventListener(MouseEvent.ROLL_OUT,outHandler);
+		}
+		public function addColumn(param:*,widthArr:Array):void{
+			if(param!=0&&!param)return;
+			var i:int=column.length;
+			if(param is DisplayObject){
+				column[i]=new Sprite();
+				column[i].name="column"+i.toString();
+				column[i].y=0;
+				column[i].addChild(param);
+				column[i].x=i>0?column[i-1].width+columnWidth:0;
+				this.addChild(column[i]);
+			}else{
+				column[i]=new TextField();
+				column[i].autoSize=TextFieldAutoSize.CENTER;
+				column[i].name="column"+i.toString();
+				column[i].y=0;
+				column[i].textColor=0xffffff;
+				column[i].htmlText=param;
+				if(widthArr[i+1]){
+					column[i].x=widthArr[i]+(widthArr[i+1]-widthArr[i]-column[i].textWidth)/2;
+				}else{
+					column[i].x=widthArr[i];
+				}
+				this.addChild(column[i]);
+				if(param.toString().search("<a href=")>-1){//如果文本中包含超连接则添加点击监听
+					column[i].addEventListener(TextEvent.LINK,textClick);
+				}else{
+					column[i].mouseEnabled=false;
+				}
+			}
+		}
+		private function textClick(e:TextEvent):void{
+			dispatchEvent(new EventInteraction("textClick",e.text));
+		}
+		public function removeColumn(i:int):void{
+			this.removeChild(column[i]);
+			column.splice(i,1);
+		}
+		public function clear():void{
+			while(this.numChildren>0){
+				this.removeChildAt(0);
+			}
+			column=[];
+		}
+		private function overHandler(e:MouseEvent):void{
+			bg.alpha=0.1;
+		}
+		private function outHandler(e:MouseEvent):void{
+			bg.alpha=0;
+		}
+		private function createBg(w:int,h:int):void{
+			bg.graphics.beginFill(0xffffff);
+			bg.graphics.drawRect(0,0,w,h);
+			this.addChild(bg);
+			bg.alpha=0;
+		}
+	}
+}
